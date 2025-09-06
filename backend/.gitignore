@@ -1,0 +1,35 @@
+# Basic Python files to ignore
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+build/
+develop-eggs/
+dist/
+eggs/
+*.egg-info/
+.installed.cfg
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# IDE and OS files
+.DS_Store
+.Trashes
+ehthumbs.db
+Thumbs.db
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Backend-specific files
+.env
+.env.*
+!.env.example
+*.sqlite3
+*.db
+/db.sqlite3
+*.log
