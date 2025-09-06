@@ -26,13 +26,14 @@ export default function SignInPage() {
                                     <Label htmlFor="password">Password</Label>
                                     <Input className="bg-gray-100" id="password" type="password" placeholder="••••••••" />
                                 </div>
-                                <a href="#" className="flex justify-end text-blue-500">
-                                    Forgot Password
+                                <a href="#" className="flex justify-end">
+                                    Forgot Password?
                                 </a>
                                 <Button className="w-full" variant="default" type="submit">Sign In</Button>
                             </div>
                         </form>
                     </div>
+                    <span className="text-center text-sm text-muted-foreground mt-8">By signing in, you agree to our <a href="#" className="text-blue-500">Terms & Conditions</a> and <a href="#" className="text-blue-500">Privacy Policy</a></span>
                 </div>
             </div>
         </div>
