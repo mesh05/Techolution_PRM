@@ -1,13 +1,45 @@
+import {
+    Sheet,
+    SheetContent,
+    SheetDescription,
+    SheetHeader,
+    SheetTitle,
+    SheetTrigger,
+} from "@/components/ui/sheet"
+import { Label } from "@radix-ui/react-label"
+import { Button } from "./ui/button"
+import { Menu } from "lucide-react"
+
 export default function Navbar({ user }: { user: any }) {
     return (
         <nav className="fixed top-0 left-0 right-0 z-50 flex justify-between w-screen h-16 border-b p-4">
             <div className="flex gap-4">
+                <Sheet>
+                    <SheetTrigger>
+                        <Button variant="outline">
+                            <Menu />
+                        </Button>
+                    </SheetTrigger>
+                    <SheetContent side="left">
+                        <SheetHeader>
+                            <SheetTitle>AllocAI</SheetTitle>
+                            <SheetDescription>
+                                AI driven resource allocation for smarter project staffing
+                            </SheetDescription>
+                            <div className="flex flex-col gap-2">
+                                <a href="/chat">Chat</a>
+                                <a href="/projects">Projects</a>
+                                <a href="/resources">Resources</a>
+                            </div>
+                        </SheetHeader>
+                    </SheetContent>
+                </Sheet>
                 <h1 className="text-2xl font-bold">AllocAI</h1>
             </div>
             {user && (
                 <div className="flex gap-4">
-                    <a href="/">Home</a>
-                    <a href="/dashboard">Dashboard</a>
+                    <a href="/chat">Chat</a>
+                    <a href="/projects">Projects</a>
                     <a href="/" onClick={() => localStorage.removeItem("user")}>Logout</a>
                 </div>
             )}

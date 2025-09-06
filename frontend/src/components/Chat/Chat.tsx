@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Input } from "../ui/input";
 import { Separator } from "../ui/separator";
-import { Download, Send } from "lucide-react";
-import { Label } from "../ui/label";
+import { Download, History, PanelLeft, PanelRight, Send } from "lucide-react";
 import { Button } from "../ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import { cn } from "@/lib/utils";
 
 const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:8000";
 
@@ -11,6 +12,7 @@ type User = { id: string; username: string; conversation_id: string };
 type Msg = { role: "system" | "user" | "assistant"; content: string; ts?: string };
 
 export default function Dashboard({ user }: { user: User }) {
+  const [hideChat, setHideChat] = useState(false);
   const [projectRequirementDoc, setProjectRequirementDoc] = useState<File | null>(null);
   const [resourceDoc, setResourceDoc] = useState<File | null>(null);
   const [messages, setMessages] = useState<Msg[]>([]);
@@ -97,7 +99,7 @@ export default function Dashboard({ user }: { user: User }) {
   return (
     <div className="flex justify-center items-center h-screen w-screen pt-16">
       {/* Chat pane */}
-      <div className="flex flex-col p-4 h-full w-1/3">
+      <div className={cn("flex flex-col p-4 h-full w-1/3", hideChat ? "hidden" : "")}>
         <h1 className="text-2xl font-bold mb-2">Chat</h1>
         <div className="flex flex-col gap-3 h-full overflow-y-auto pr-2">
           {messages.map((m, i) => (
@@ -123,19 +125,25 @@ export default function Dashboard({ user }: { user: User }) {
       <Separator orientation="vertical" />
 
       {/* Right pane */}
-      <div className="flex flex-col gap-4 w-2/3 h-full bg-gray-100 p-4">
-        <div className="flex items-center gap-4">
-          <Label>Project requirement Doc</Label>
-          <Input type="file" onChange={(e) => setProjectRequirementDoc(e.target.files?.[0] ?? null)} />
-          <Label>Resource Doc</Label>
-          <Input type="file" onChange={(e) => setResourceDoc(e.target.files?.[0] ?? null)} />
-          <Button onClick={handleUpload}>Submit</Button>
-        </div>
-        <Separator orientation="horizontal" />
+      <div className="flex flex-col gap-4 w-full h-full bg-gray-100 p-4">
         <div className="flex flex-col text-center gap-4">
           <div className="flex justify-between items-center">
-            <div className="font-semibold">Uploaded Files</div>
-            <Download className="cursor-pointer" onClick={downloadFilesList} />
+            <Button variant="outline" onClick={() => setHideChat(!hideChat)}>
+              {hideChat ? <PanelRight/> : <PanelLeft/>}
+            </Button>
+            <div className="flex font-semibold gap-4">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline"><History /></Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuLabel>Result 1</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuLabel>Result 2</DropdownMenuLabel>
+                </DropdownMenuContent>
+              </DropdownMenu> 
+              <Button variant="outline">Download <Download onClick={downloadFilesList} /></Button>
+            </div>
           </div>
           <p className="text-sm text-gray-500">
             Upload your docs, then ask questions in the chat. Responses are stored in the conversation.

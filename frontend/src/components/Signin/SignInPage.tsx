@@ -24,7 +24,7 @@ export default function SignInPage() {
     }
     const user = await r.json(); // { id, username, conversation_id }
     localStorage.setItem("user", JSON.stringify(user));
-    nav("/dashboard");
+    nav("/chat");
   }
 
   return (

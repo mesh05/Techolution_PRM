@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Dashboard from "./Dashboard";
+import Dashboard from "./Chat";
+import Navbar from "../Navbar";
 
 export default function DashboardPage() {
   const nav = useNavigate();
@@ -21,5 +22,10 @@ export default function DashboardPage() {
   }, [nav]);
 
   if (!user) return null;
-  return <Dashboard user={user} />;
+  return (
+    <>
+      <Navbar user={user} />
+      <Dashboard user={user} />
+    </>
+  )
 }
