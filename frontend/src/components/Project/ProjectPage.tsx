@@ -9,6 +9,7 @@ import { useRef } from "react";
 export default function ProjectPage() {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const user = JSON.parse(localStorage.getItem("user")!);
+    if (!user) window.location.href = "/";
     return (
         <div>
             <Navbar user={user} />
