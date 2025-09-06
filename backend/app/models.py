@@ -34,3 +34,21 @@ class User(BaseModel):
     id: str
     username: str
     conversation_id: str
+
+# Uploads
+class FileItem(BaseModel):
+    filename: str
+    size: int
+
+class FileUploadResponse(BaseModel):
+    uploaded: List[FileItem]
+
+class FileListResponse(BaseModel):
+    files: List[FileItem]
+
+# Ask (chat to AI)
+class AskRequest(BaseModel):
+    question: str = Field(min_length=1)
+
+class AskResponse(BaseModel):
+    answer: str

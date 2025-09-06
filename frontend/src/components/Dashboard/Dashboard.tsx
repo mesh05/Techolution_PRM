@@ -1,59 +1,147 @@
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Input } from "../ui/input";
 import { Separator } from "../ui/separator";
 import { Download, Send } from "lucide-react";
 import { Label } from "../ui/label";
 import { Button } from "../ui/button";
-import { useState } from "react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 
-export default function Dashboard({ user }: { user: any }) {
-    const [projectRequirementDoc, setProjectRequirementDoc] = useState<any>(null);
-    const [resourceDoc, setResourceDoc] = useState<any>(null);
-    if(!user) {
-        console.log("User not found");
+const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:8000";
+
+type User = { id: string; username: string; conversation_id: string };
+type Msg = { role: "system" | "user" | "assistant"; content: string; ts?: string };
+
+export default function Dashboard({ user }: { user: User }) {
+  const [projectRequirementDoc, setProjectRequirementDoc] = useState<File | null>(null);
+  const [resourceDoc, setResourceDoc] = useState<File | null>(null);
+  const [messages, setMessages] = useState<Msg[]>([]);
+  const [input, setInput] = useState("");
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  const headers = useMemo(() => ({ "X-User-ID": user.username }), [user.username]);
+
+  async function loadMessages() {
+    const r = await fetch(
+      `${API_BASE}/conversations/${user.conversation_id}/messages?limit=200`,
+      { headers }
+    );
+    if (r.ok) {
+      const data: Msg[] = await r.json();
+      setMessages(data);
     }
+  }
 
-    return (
-        <div className="flex justify-center items-center h-screen w-screen pt-16">
-            <div className="flex flex-col p-4 h-full w-1/4">
-                <h1 className="text-2xl font-bold">Chat</h1>
-                <div className="flex flex-col gap-4 h-full">
-                    messages
-                </div>
-                <div className="flex flex-col gap-4 relative">
-                    <div className="sticky bottom-0 flex gap-4 ">
-                        <Input type="text" placeholder="Enter your message" />
-                        <Send className="cursor-pointer" onClick={() => console.log("Send")}/>
-                    </div>
-                </div>
+  useEffect(() => {
+    loadMessages();
+  }, []); // eslint-disable-line
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages.length]);
+
+  async function handleUpload() {
+    if (!projectRequirementDoc && !resourceDoc) {
+      alert("Please choose at least one file");
+      return;
+    }
+    const fd = new FormData();
+    fd.append("conversation_id", user.conversation_id);
+    if (projectRequirementDoc) fd.append("files", projectRequirementDoc);
+    if (resourceDoc) fd.append("files", resourceDoc);
+    const r = await fetch(`${API_BASE}/files/upload`, {
+      method: "POST",
+      headers,
+      body: fd,
+    });
+    if (!r.ok) {
+      alert("Upload failed");
+      return;
+    }
+    const res = await r.json();
+    console.log("Uploaded:", res);
+    alert("Uploaded successfully");
+  }
+
+  async function handleAsk() {
+    const q = input.trim();
+    if (!q) return;
+    setInput("");
+    // optimistic render
+    setMessages((m) => [...m, { role: "user", content: q }]);
+
+    const r = await fetch(`${API_BASE}/ai/ask/${user.conversation_id}`, {
+      method: "POST",
+      headers: { ...headers, "Content-Type": "application/json" },
+      body: JSON.stringify({ question: q }),
+    });
+    if (!r.ok) {
+      setMessages((m) => [...m, { role: "assistant", content: "(error talking to AI)" }]);
+      return;
+    }
+    const { answer } = await r.json();
+    setMessages((m) => [...m, { role: "assistant", content: answer }]);
+  }
+
+  async function downloadFilesList() {
+    const r = await fetch(`${API_BASE}/files/${user.conversation_id}`, { headers });
+    if (!r.ok) return alert("Could not list files");
+    const data = await r.json(); // { files: [{filename, size}] }
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "files.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  return (
+    <div className="flex justify-center items-center h-screen w-screen pt-16">
+      {/* Chat pane */}
+      <div className="flex flex-col p-4 h-full w-1/3">
+        <h1 className="text-2xl font-bold mb-2">Chat</h1>
+        <div className="flex flex-col gap-3 h-full overflow-y-auto pr-2">
+          {messages.map((m, i) => (
+            <div key={i} className={`p-2 rounded ${m.role === "user" ? "bg-blue-50 self-end" : "bg-gray-50 self-start"}`}>
+              <div className="text-xs opacity-60 mb-1">{m.role}</div>
+              <div className="whitespace-pre-wrap">{m.content}</div>
             </div>
-            <Separator orientation="vertical" />
-            <div className="flex flex-col gap-4 w-3/4 h-full bg-gray-100 p-4">
-                <div className="flex gap-4">
-                    <Label>Project requirement Doc</Label>
-                    <Input type="file" onChange={(e) => setProjectRequirementDoc(e.target.files?.[0])}/>
-                    <Label>Resource Doc</Label>
-                    <Input type="file" onChange={(e) => setResourceDoc(e.target.files?.[0])}/>
-                    <Button onClick={() => console.log("Submit")}>Submit</Button>
-                </div>
-                <Separator orientation="horizontal"/>
-                <div className="flex flex-col text-center gap-4">
-                    <div className="flex justify-between cursor-pointer gap-4">
-                        <DropdownMenu>
-                            <DropdownMenuTrigger>
-                                <Button variant="outline">result 1</Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent>
-                                <DropdownMenuItem>result 1</DropdownMenuItem>
-                                <DropdownMenuItem>result 2</DropdownMenuItem>
-                                <DropdownMenuItem>result 3</DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                        <Download onClick={() => console.log("Download")}/>
-                    </div>
-                    <h1>Response</h1>
-                </div>
-            </div>
+          ))}
+          <div ref={bottomRef} />
         </div>
-    )
+        <div className="flex gap-2 mt-2">
+          <Input
+            type="text"
+            placeholder="Ask something about your uploaded docs…"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleAsk()}
+          />
+          <Button onClick={handleAsk}><Send className="w-4 h-4" /></Button>
+        </div>
+      </div>
+
+      <Separator orientation="vertical" />
+
+      {/* Right pane */}
+      <div className="flex flex-col gap-4 w-2/3 h-full bg-gray-100 p-4">
+        <div className="flex items-center gap-4">
+          <Label>Project requirement Doc</Label>
+          <Input type="file" onChange={(e) => setProjectRequirementDoc(e.target.files?.[0] ?? null)} />
+          <Label>Resource Doc</Label>
+          <Input type="file" onChange={(e) => setResourceDoc(e.target.files?.[0] ?? null)} />
+          <Button onClick={handleUpload}>Submit</Button>
+        </div>
+        <Separator orientation="horizontal" />
+        <div className="flex flex-col text-center gap-4">
+          <div className="flex justify-between items-center">
+            <div className="font-semibold">Uploaded Files</div>
+            <Download className="cursor-pointer" onClick={downloadFilesList} />
+          </div>
+          <p className="text-sm text-gray-500">
+            Upload your docs, then ask questions in the chat. Responses are stored in the conversation.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
 }

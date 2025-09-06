@@ -1,21 +1,25 @@
 import { useEffect, useState } from "react";
-import Navbar from "@/components/Navbar";
+import { useNavigate } from "react-router-dom";
 import Dashboard from "./Dashboard";
 
 export default function DashboardPage() {
-    const [user, setUser] = useState<any>(null);
-    useEffect(() => {
-        const user = localStorage.getItem("user");
-        if (!user) {
-            console.log("User not found");
-        }
-        setUser(user);
-    }, []);
+  const nav = useNavigate();
+  const [user, setUser] = useState<any>(null);
 
-    return (
-        <div>
-            <Navbar user={user}/>
-            <Dashboard user={user}/>
-        </div>
-    )
+  useEffect(() => {
+    const raw = localStorage.getItem("user");
+    if (!raw) {
+      nav("/");
+      return;
+    }
+    try {
+      setUser(JSON.parse(raw));
+    } catch {
+      localStorage.removeItem("user");
+      nav("/");
+    }
+  }, [nav]);
+
+  if (!user) return null;
+  return <Dashboard user={user} />;
 }
