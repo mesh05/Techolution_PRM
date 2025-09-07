@@ -131,24 +131,6 @@ export const columns: ColumnDef<Project>[] = [
     cell: ({ row }) => <div className="lowercase">{row.getValue("problemStatement")}</div>,
   },
   {
-    accessorKey: "requiredSkills",
-    header: () => <div className="text-right">Required Skills</div>,
-    cell: ({ row }) => {
-      const requiredSkills = row.getValue("requiredSkills") as string
-
-      return <div className="text-right font-medium">{requiredSkills}</div>
-    },
-  },
-  {
-    accessorKey: "requiredSeniorityMix",
-    header: () => <div className="text-right">Required Seniority Mix</div>,
-    cell: ({ row }) => {
-      const requiredSeniorityMix = row.getValue("requiredSeniorityMix") as string
-
-      return <div className="text-right font-medium">{requiredSeniorityMix}</div>
-    },
-  },
-  {
     accessorKey: "startDate",
     header: () => <div className="text-right">Start Date</div>,
     cell: ({ row }) => {
@@ -173,6 +155,25 @@ export const columns: ColumnDef<Project>[] = [
       const milestones = row.getValue("milestones") as string
 
       return <div className="text-right font-medium">{milestones}</div>
+    },
+  },
+  ,
+  {
+    accessorKey: "requiredSkills",
+    header: () => <div className="text-right">Required Skills</div>,
+    cell: ({ row }) => {
+      const requiredSkills = row.getValue("requiredSkills") as string
+
+      return <div className="text-right font-medium">{requiredSkills}</div>
+    },
+  },
+  {
+    accessorKey: "requiredSeniorityMix",
+    header: () => <div className="text-right">Required Seniority Mix</div>,
+    cell: ({ row }) => {
+      const requiredSeniorityMix = row.getValue("requiredSeniorityMix") as string
+
+      return <div className="text-right font-medium">{requiredSeniorityMix}</div>
     },
   },
   {
@@ -251,7 +252,7 @@ export const columns: ColumnDef<Project>[] = [
   },
 ]
 
-export default function ProjectTable() {
+export default function ProjectTable({ data }: { data: Project[] }) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -283,10 +284,10 @@ export default function ProjectTable() {
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter emails..."
-          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+          placeholder="Filter names..."
+          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("email")?.setFilterValue(event.target.value)
+            table.getColumn("name")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />

@@ -107,19 +107,26 @@ def get_conversation(user_id: str | None, cid: str) -> ConversationSummary:
     _ensure_exists(path)
     return summarize_conversation(path)
 
+# storage.py
 def append_message(user_id: str | None, cid: str, role: str, content: str) -> MessageOut:
     path = _conv_path(_validate_user(user_id), cid)
     if not path.exists():
         raise HTTPException(status_code=404, detail="Conversation not found")
+
+    # NEW: coerce to string safely
+    if not isinstance(content, str):
+        try:
+            content = json.dumps(content, ensure_ascii=False)
+        except Exception:
+            content = str(content)
+
     content = content.strip()
     if not content:
         raise HTTPException(status_code=422, detail="content must be non-empty")
+
     record = MessageOut(role=role, content=content, ts=_utc_iso())
-    lock = FileLock(str(path) + ".lock")
-    with lock:
-        with path.open("a", encoding="utf-8") as f:
-            f.write(json.dumps(record.dict(), ensure_ascii=False) + "\n")
-    return record
+    # ... keep the rest unchanged ...
+
 
 def get_messages(user_id: str | None, cid: str, limit: int, offset: int) -> List[MessageOut]:
     path = _conv_path(_validate_user(user_id), cid)

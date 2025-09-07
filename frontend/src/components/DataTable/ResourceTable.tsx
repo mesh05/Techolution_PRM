@@ -252,7 +252,7 @@ export const columns: ColumnDef<Resource>[] = [
   },
 ]
 
-export default function ResourceTable() {
+export default function ResourceTable({ data } : { data: Resource[] }) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []

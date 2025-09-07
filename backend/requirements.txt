@@ -4,3 +4,8 @@ pydantic
 filelock
 httpx 
 python-multipart
+pandas 
+sqlalchemy 
+psycopg2-binary 
+python-dotenv 
+openpyxl
