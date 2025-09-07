@@ -1,14 +1,15 @@
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import Navbar from "../Navbar";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 import { Separator } from "../ui/separator";
 import { useRef } from "react";
+import ProjectTable from "@/components/DataTable/ProjectTable";
 
 export default function ProjectPage() {
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const user = JSON.parse(localStorage.getItem("user")!);
+    const rawUser = typeof window !== 'undefined' ? localStorage.getItem("user") : null;
+    const user = rawUser ? (() => { try { return JSON.parse(rawUser) } catch { return null } })() : null;
     if (!user) window.location.href = "/";
     return (
         <div>
@@ -19,13 +20,12 @@ export default function ProjectPage() {
                         <h1 className="text-2xl font-semibold">Projects</h1>
                     </div>
                     <div className="flex gap-2 w-full justify-between items-center">
-                        <Input className="w-1/2" placeholder="Project name" />
                         <div className="flex gap-2">
                             <Button variant="outline">
                                 Export
                             </Button>
                             <Dialog>
-                                <DialogTrigger>
+                                <DialogTrigger asChild>
                                     <Button variant="default">
                                         Add Project
                                     </Button>
@@ -38,12 +38,12 @@ export default function ProjectPage() {
                                     <Input placeholder="Client name" />
                                     <Input placeholder="Start date" type="date" />
                                     <Input placeholder="End date" type="date" />
-                                    <DialogClose>
+                                    <DialogClose asChild>
                                         <Button onClick={() => console.log("Add project")} variant="default">Add Project</Button>
                                     </DialogClose>
                                     <Separator />
-                                    <DialogClose>
-                                        <Input ref={fileInputRef} className="hidden" type="file" onChange={(e) => console.log(e.target.files)}/>
+                                    <Input ref={fileInputRef} className="hidden" type="file" onChange={(e) => console.log(e.target.files)}/>
+                                    <DialogClose asChild>
                                         <Button variant="outline" onClick={() => fileInputRef.current?.click()}>Upload</Button>
                                     </DialogClose>
                                 </DialogContent>
@@ -51,24 +51,7 @@ export default function ProjectPage() {
                         </div>
                     </div>
                     <div >
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Name</TableHead>
-                                <TableHead>Client</TableHead>
-                                <TableHead>Start Date</TableHead>
-                                <TableHead>End Date</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            <TableRow>
-                                <TableCell>Project 1</TableCell>
-                                <TableCell>Client 1</TableCell>
-                                <TableCell>2025-09-01</TableCell>
-                                <TableCell>2025-09-30</TableCell>
-                            </TableRow>
-                        </TableBody>
-                    </Table>
+                    <ProjectTable/>
                 </div>
                 </div>
 

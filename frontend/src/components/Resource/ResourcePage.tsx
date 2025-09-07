@@ -5,6 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 import { Separator } from "../ui/separator";
 import { useRef } from "react";
+import ResourceTable from "../DataTable/ResourceTable";
 
 export default function ResourcePage() {
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -19,7 +20,6 @@ export default function ResourcePage() {
                         <h1 className="text-2xl font-semibold">Resources</h1>
                     </div>
                     <div className="flex gap-2 w-full justify-between items-center">
-                        <Input className="w-1/2" placeholder="Resource name" />
                         <div className="flex gap-2">
                             <Button variant="outline">
                                 Export
@@ -49,20 +49,7 @@ export default function ResourcePage() {
                         </div>
                     </div>
                     <div >
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Name</TableHead>
-                                <TableHead>Role</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            <TableRow>
-                                <TableCell>Resource 1</TableCell>
-                                <TableCell>Role 1</TableCell>
-                            </TableRow>
-                        </TableBody>
-                    </Table>
+                    <ResourceTable/>
                 </div>
                 </div>
 
