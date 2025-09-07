@@ -3,10 +3,19 @@ import { Button } from "../ui/button";
 import Navbar from "../Navbar";
 import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 import { Separator } from "../ui/separator";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import ProjectTable from "@/components/DataTable/ProjectTable";
+import { Skeleton } from "../ui/skeleton";
+import { useState } from "react";
 
 export default function ProjectPage() {
+    useEffect(() => {
+        setLoading(true);
+        setTimeout(() => {
+            setLoading(false);
+        }, 1000);
+    },[])
+    const [loading, setLoading] = useState(true);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const rawUser = typeof window !== 'undefined' ? localStorage.getItem("user") : null;
     const user = rawUser ? (() => { try { return JSON.parse(rawUser) } catch { return null } })() : null;
@@ -51,7 +60,16 @@ export default function ProjectPage() {
                         </div>
                     </div>
                     <div >
-                    <ProjectTable/>
+                    <div >
+                        {loading ? <>
+                            <Skeleton className="h-8 w-1/4" />
+                            <div className="mt-4 space-y-2">
+                                <Skeleton className="h-[125px] w-full rounded-xl" />
+                            </div>
+                        </>
+                        : <ProjectTable/>
+                        }
+                    </div>
                 </div>
                 </div>
 

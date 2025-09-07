@@ -6,7 +6,7 @@ import {
     SheetTrigger,
 } from "@/components/ui/sheet"
 import { Button } from "./ui/button"
-import { FerrisWheel, Menu, Settings } from "lucide-react"
+import { FerrisWheel, Menu, Settings, Users } from "lucide-react"
 import { Link } from "react-router-dom";
 import { MessageCircle, Folder } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -32,13 +32,13 @@ export default function Navbar({ user }: { user: any }) {
                                 </Link>
                                 <Link className="w-full" to="/projects">
                                     <Button className="w-full border-0 justify-start" variant={path === "/projects" ? "default" : "outline"}>
-                                        <Settings className={cn("text-secondary", path !== "/projects" ? "text-primary" : "")}/>
+                                        <Folder className={cn("text-secondary", path !== "/projects" ? "text-primary" : "")}/>
                                         Projects
                                     </Button>
                                 </Link>
                                 <Link className="w-full" to="/resources">
                                     <Button className="w-full border-0 justify-start" variant={path === "/resources" ? "default" : "outline"}>
-                                        <Folder className={cn("text-secondary", path !== "/resources" ? "text-primary" : "")}/>
+                                        <Users className={cn("text-secondary", path !== "/resources" ? "text-primary" : "")}/>
                                         Resources
                                     </Button>
                                 </Link>
